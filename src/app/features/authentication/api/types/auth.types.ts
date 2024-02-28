@@ -1,3 +1,5 @@
+import { FuseSettingsConfigType } from '@root/@fuse/core/FuseSettings/FuseSettings';
+
 export type AuthUser = {
 	uid: string;
 	role: string | null;
@@ -6,7 +8,8 @@ export type AuthUser = {
 		photoURL: string;
 		email?: string;
 		shortcuts: string[];
-		settings: unknown;
+		settings?: Partial<FuseSettingsConfigType>;
+		loginRedirectUrl?: string;
 	};
 };
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import * as React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,12 +7,11 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 import { z } from 'zod';
 
 import { useAuth } from '@root/app/features/authentication/contexts/AuthRouteProvider';
 import _ from '@root/app/libs/@lodash';
-
 /**
  * Form Validation Schema
  */
@@ -47,39 +46,38 @@ function Form() {
 
 	const { isValid, dirtyFields, errors } = formState;
 
-	useEffect(() => {
-		setValue('email', 'admin@fusetheme.com', { shouldDirty: true, shouldValidate: true });
-		setValue('password', 'admin', { shouldDirty: true, shouldValidate: true });
-	}, [setValue]);
-
 	function onSubmit(formData: FormType) {
 		const { email, password } = formData;
 
-		jwtService
-			.signIn({
-				email,
-				password
-			})
-			.catch(
-				(
-					error: AxiosError<
-						{
-							type: 'email' | 'password' | 'remember' | `root.${string}` | 'root';
-							message: string;
-						}[]
-					>
-				) => {
-					const errorData = error.response.data;
+		jwtService.signIn({
+			email,
+			password
+		});
+		// .catch(
+		// 	(
+		// 		error: AxiosError<
+		// 			{
+		// 				type: 'email' | 'password' | 'remember' | `root.${string}` | 'root';
+		// 				message: string;
+		// 			}[]
+		// 		>
+		// 	) => {
+		// 		const errorData = error.response.data;
 
-					errorData.forEach((err) => {
-						setError(err.type, {
-							type: 'manual',
-							message: err.message
-						});
-					});
-				}
-			);
+		// 		errorData.forEach((err) => {
+		// 			setError(err.type, {
+		// 				type: 'manual',
+		// 				message: err.message
+		// 			});
+		// 		});
+		// 	}
+		// );
 	}
+
+	React.useEffect(() => {
+		setValue('email', 'admin@fusetheme.com', { shouldDirty: true, shouldValidate: true });
+		setValue('password', 'admin', { shouldDirty: true, shouldValidate: true });
+	}, [setValue]);
 
 	return (
 		<div className="w-full">

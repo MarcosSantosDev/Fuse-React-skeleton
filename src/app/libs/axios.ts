@@ -1,7 +1,7 @@
 import { env } from '@root/env';
 import axios from 'axios';
 
-import { ACCESS_TOKEN } from '../constants/localStore';
+import localStorageUtils from '@root/app/utils/localStorage';
 
 const axiosInstance = () => {
 	const axiosInstance = axios.create({
@@ -10,7 +10,7 @@ const axiosInstance = () => {
 
 	axiosInstance.interceptors.request.use(
 		(config) => {
-			const token = localStorage.getItem(ACCESS_TOKEN);
+			const token = localStorageUtils.getAccessToken();
 
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`;

@@ -1,6 +1,5 @@
-import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import * as React from 'react';
 import { useSelector } from 'react-redux';
-import { PartialDeep } from 'type-fest';
 
 import BrowserRouter from '@root/@fuse/core/BrowserRouter';
 import FuseAuthorization from '@root/@fuse/core/FuseAuthorization';
@@ -10,7 +9,6 @@ import { useAppDispatch } from '@root/store/store';
 import withReducer from '@root/store/withReducer';
 
 import useJwtAuth, { JwtAuth } from '@root/app/features/authentication/hooks/useJwtAuth';
-import { User } from '@root/app/features/user';
 import {
 	resetUser,
 	selectUser,
@@ -19,6 +17,9 @@ import {
 	updateUser,
 	userSlice
 } from '@root/app/features/user/store/userSlice';
+import localStorageUtils from '@root/app/utils/localStorage';
+
+import { AuthUser } from '../api/types/auth.types';
 
 /**
  * Initialize Firebase
@@ -35,15 +36,12 @@ export type SignUpPayload = {
 };
 
 type AuthContext = {
-	jwtService?: JwtAuth<User, SignInPayload, SignUpPayload>;
+	jwtService?: JwtAuth<AuthUser>;
 	signOut?: () => void;
-	updateUser?: (U: PartialDeep<User>) => void;
-	isAuthenticated: boolean;
+	updateUser?: (U: AuthUser) => void;
 };
 
-const AuthContext = createContext<AuthContext>({
-	isAuthenticated: false
-});
+const AuthContext = React.createContext<AuthContext>({});
 
 type AuthProviderProps = { children: React.ReactNode };
 
@@ -61,26 +59,17 @@ function AuthRoute(props: AuthProviderProps) {
 	 * Jwt auth service
 	 */
 	const jwtService = useJwtAuth({
-		config: {
-			tokenStorageKey: 'jwt_access_token',
-			signInUrl: '/auth/sign-in',
-			signUpUrl: '/auth/sign-up',
-			tokenRefreshUrl: '/auth/refresh',
-			getUserUrl: '/auth/user',
-			updateUserUrl: '/auth/user',
-			updateTokenFromHeader: true
-		},
-		onSignedIn: (user: User) => {
+		onSignedIn: (user) => {
 			dispatch(setUser(user));
-			setAuthService('jwt');
+			localStorageUtils.setAuthService('jwt');
 		},
-		onSignedUp: (user: User) => {
+		onSignedUp: (user) => {
 			dispatch(setUser(user));
-			setAuthService('jwt');
+			localStorageUtils.setAuthService('jwt');
 		},
 		onSignedOut: () => {
 			dispatch(resetUser());
-			resetAuthService();
+			localStorageUtils.resetAuthService();
 		},
 		onUpdateUser: (user) => {
 			dispatch(updateUser(user));
@@ -94,21 +83,16 @@ function AuthRoute(props: AuthProviderProps) {
 	/**
 	 * Check if services is in loading state
 	 */
-	const isLoading = useMemo(() => jwtService?.isLoading, [jwtService?.isLoading]);
-
-	/**
-	 * Check if user is authenticated
-	 */
-	const isAuthenticated = useMemo(() => jwtService?.isAuthenticated, [jwtService?.isAuthenticated]);
+	const isLoading = React.useMemo(() => jwtService?.isLoading, [jwtService?.isLoading]);
 
 	/**
 	 * Combine auth services
 	 */
-	const combinedAuth = useMemo<AuthContext>(
+	const combinedAuth = React.useMemo<AuthContext>(
 		() => ({
 			jwtService,
 			signOut: () => {
-				const authService = getAuthService();
+				const authService = localStorageUtils.getAuthService();
 
 				if (authService === 'jwt') {
 					return jwtService?.signOut();
@@ -117,41 +101,18 @@ function AuthRoute(props: AuthProviderProps) {
 				return null;
 			},
 			updateUser: (userData) => {
-				const authService = getAuthService();
+				const authService = localStorageUtils.getAuthService();
 
 				if (authService === 'jwt') {
 					return jwtService?.updateUser(userData);
 				}
 
 				return null;
-			},
-			isAuthenticated
+			}
 		}),
-		[isAuthenticated, user]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[]
 	);
-
-	/**
-	 * Get auth service
-	 */
-	const getAuthService = useCallback(() => {
-		return localStorage.getItem('authService');
-	}, []);
-
-	/**
-	 * Set auth service
-	 */
-	const setAuthService = useCallback((authService: string) => {
-		if (authService) {
-			localStorage.setItem('authService', authService);
-		}
-	}, []);
-
-	/**
-	 * Reset auth service
-	 */
-	const resetAuthService = useCallback(() => {
-		localStorage.removeItem('authService');
-	}, []);
 
 	/**
 	 * Render loading screen while loading user data
@@ -170,7 +131,7 @@ function AuthRoute(props: AuthProviderProps) {
 }
 
 function useAuth(): AuthContext {
-	const context = useContext(AuthContext);
+	const context = React.useContext(AuthContext);
 	if (!context) {
 		throw new Error('useAuth must be used within a AuthRouteProvider');
 	}

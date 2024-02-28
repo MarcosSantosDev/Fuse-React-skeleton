@@ -1,22 +1,21 @@
 /* eslint import/no-extraneous-dependencies: off */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { PartialDeep } from 'type-fest';
 
 import { RootStateType } from '@root/store/types';
 
 import settingsConfig from '@root/app/configs/settingsConfig';
-import { User } from '@root/app/features/user';
 import _ from '@root/app/libs/@lodash';
 
+import { AuthUser } from '../../authentication/api/types/auth.types';
 import userModel from '../models/UserModel';
 
 type AppRootStateType = RootStateType<userSliceType>;
 
-function updateRedirectUrl(user: PartialDeep<User>) {
+function updateRedirectUrl(user: AuthUser) {
 	/*
 	  You can redirect the logged-in user to a specific route depending on his role
 	  */
-	if (user?.data?.loginRedirectUrl && user?.data?.loginRedirectUrl !== '') {
+	if (user?.data?.loginRedirectUrl && user.data.loginRedirectUrl !== '') {
 		settingsConfig.loginRedirectUrl = user.data.loginRedirectUrl; // for example 'apps/academy'
 	}
 }
@@ -24,7 +23,7 @@ function updateRedirectUrl(user: PartialDeep<User>) {
 /**
  * Sets the user object in the Redux store.
  */
-export const setUser = createAsyncThunk<User, User>('user/setUser', async (user) => {
+export const setUser = createAsyncThunk<AuthUser, AuthUser>('user/setUser', async (user) => {
 	updateRedirectUrl(user);
 
 	return user;
@@ -40,7 +39,7 @@ export const resetUser = createAsyncThunk('user/resetUser', async () => {
 /**
  * The initial state of the user slice.
  */
-const initialState: User = userModel({});
+const initialState: AuthUser = userModel({});
 
 /**
  * The User slice
@@ -54,7 +53,7 @@ export const userSlice = createSlice({
 		 */
 		setUserShortcuts: (state, action) => {
 			const oldState = _.cloneDeep(state);
-			const newUser = _.setIn(oldState, 'data.shortcuts', action.payload) as User;
+			const newUser = _.setIn(oldState, 'data.shortcuts', action.payload) as AuthUser;
 
 			if (_.isEqual(oldState, newUser)) {
 				return undefined;
@@ -66,7 +65,7 @@ export const userSlice = createSlice({
 		 */
 		setUserSettings: (state, action) => {
 			const oldState = _.cloneDeep(state);
-			const newUser = _.setIn(oldState, 'data.settings', action.payload) as User;
+			const newUser = _.setIn(oldState, 'data.settings', action.payload) as AuthUser;
 
 			if (_.isEqual(oldState, newUser)) {
 				return undefined;
@@ -78,19 +77,19 @@ export const userSlice = createSlice({
 		 */
 		updateUser: (state, action) => {
 			const oldState = _.cloneDeep(state);
-			const user = action.payload as PartialDeep<User>;
+			const user = action.payload as AuthUser;
 			const newUser = _.merge({}, oldState, user);
 
 			if (_.isEqual(oldState, newUser)) {
 				return undefined;
 			}
-			return newUser as User;
+			return newUser;
 		},
 		userSignOut: () => initialState
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setUser.fulfilled, (state, action) => {
-			const user = action.payload as PartialDeep<User>;
+			const user = action.payload;
 			const newUser = _.defaults(user, state);
 
 			if (_.isEqual(state, newUser)) {

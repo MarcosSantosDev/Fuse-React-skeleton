@@ -1,6 +1,6 @@
-import type { AuthUserReturn, AuthUserWithPassword } from '../types/auth.types';
+import type { AuthUser, AuthUserWithPassword } from '../types/auth.types';
 
-export const user: AuthUserReturn = {
+export const user: AuthUser = {
 	uid: 'XgbuVEXBU5gtSKdbQRP1Zbbby1i1',
 	role: 'admin',
 	data: {
@@ -8,10 +8,9 @@ export const user: AuthUserReturn = {
 		photoURL: 'assets/images/avatars/brian-hughes.jpg',
 		email: 'admin@fusetheme.com',
 		settings: {
-			layout: {},
-			theme: {}
+			layout: {}
 		},
-		shortcuts: ['apps.calendar', 'apps.mailbox', 'apps.contacts']
+		shortcuts: []
 	}
 };
 
