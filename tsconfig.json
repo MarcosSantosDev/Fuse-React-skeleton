@@ -1,0 +1,37 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./",
+		"paths": {
+			"@root/*": ["./src/*"],
+			"@/tests/*": ["./src/app/pages/__tests__/*"]
+		},
+		"declaration": true,
+		"target": "esnext",
+		"lib": ["dom", "dom.iterable", "esnext", "scripthost"],
+		"plugins": [{ "name": "typescript-plugin-css-modules" }],
+		"allowJs": true,
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": false,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"module": "esnext",
+		"moduleResolution": "Node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "react-jsx",
+		"types": ["node", "jest", "@testing-library/jest-dom"]
+	},
+	"include": [
+		"vite-env.d.ts",
+		"vite.config.mts",
+		"tailwind.config.js",
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/app/utils/tailwind/plugins/icon-size.js"
+	],
+	"exclude": ["node_modules", "cypress", "src/**/*.spec.ts", "src/app/pages/__tests__/**/*.spec.ts"]
+}

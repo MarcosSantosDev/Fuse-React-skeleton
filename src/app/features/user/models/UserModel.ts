@@ -1,0 +1,25 @@
+import { PartialDeep } from 'type-fest';
+
+import { User } from '@root/app/features/user';
+import _ from '@root/app/libs/@lodash';
+
+/**
+ * Creates a new user object with the specified data.
+ */
+function UserModel(data: PartialDeep<User>): User {
+	data = data || {};
+
+	return _.defaults(data, {
+		uid: '',
+		role: null, // guest
+		data: {
+			displayName: 'Guest User',
+			photoURL: '',
+			email: '',
+			shortcuts: [],
+			settings: {}
+		}
+	});
+}
+
+export default UserModel;

@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+.yarn/
+
+# production
+build/
+public/
+
+# ide
+.vscode/
+
+dist/
+env.d.ts
+
+.prettierrc.js
+.eslintrc.js
+jest.config.ts
+jest.setup.ts
+cypress
+config-overrides.cjs
+commitlint.config.cjs
+cypress.config.ts
+lint-staged.config.cjs
+icon-size.js
